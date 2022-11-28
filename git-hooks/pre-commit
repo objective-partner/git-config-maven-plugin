@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+MVN="./mvnw"
+
+if command -v mvnd &> /dev/null
+then
+    MVN="mvnd"
+fi
+
+$MVN process-resources
+if [ $? != 0 ]
+then
+    exit 1
+fi
+
+git update-index --again
