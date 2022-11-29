@@ -20,9 +20,11 @@ package de.op.maven.plugins.gitconfig;
  * #L%
  */
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
 import java.nio.file.Path;
+import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +48,7 @@ class HooksPathMojoTests {
   }
 
   @Test
-  void testSetHooksPath(@TempDir Path projectDir) throws Exception {
+  void given_GitRepoExists_when_SettingHooksPath() throws Exception {
     FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
     Repository repo = repoBuilder.setGitDir(gitRepoPath).readEnvironment().findGitDir().build();
     repo.create();
@@ -55,5 +57,15 @@ class HooksPathMojoTests {
 
     String hooksPath = repo.getConfig().getString("core", null, "hooksPath");
     assertThat(hooksPath).isEqualTo(gitHooksPath.toString());
+  }
+
+  @Test
+  void given_NoGitRepoExists_when_SettingHooksPath() throws Exception {
+    try {
+      mojo.execute();
+      fail("Mojo should throw an MojoFailureException");
+    } catch (MojoFailureException e) {
+      assertThat(e.getMessage()).contains("/.git");
+    }
   }
 }
