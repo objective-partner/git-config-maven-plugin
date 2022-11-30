@@ -1,11 +1,15 @@
 name: Java CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - ! master
+      - ! develop
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -15,4 +19,4 @@ jobs:
           distribution: 'adopt'
           cache: maven
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots package
+        run: mvn -B --update-snapshots package
