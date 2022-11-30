@@ -1,3 +1,7 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "sonarlint.connectedMode.project": {
+        "connectionId": "SonarQube - devinf - op",
+        "projectKey": "objective-partner_git-config-maven-plugin_AYTIKClYu__fo8QfQujp"
+    }
 }
