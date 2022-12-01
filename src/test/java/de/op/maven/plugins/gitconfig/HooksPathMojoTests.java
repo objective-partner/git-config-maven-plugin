@@ -19,11 +19,14 @@ package de.op.maven.plugins.gitconfig;
  * limitations under the License.
  * #L%
  */
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -63,9 +66,25 @@ class HooksPathMojoTests {
   void given_NoGitRepoExists_when_SettingHooksPath() throws Exception {
     try {
       mojo.execute();
-      fail("Mojo should throw an MojoFailureException");
+      fail("Mojo should throw a MojoFailureException");
     } catch (MojoFailureException e) {
       assertThat(e.getMessage()).contains("/.git");
+    }
+  }
+
+  @Test
+  void given_GitRepoNotWriteable_when_SettingHooksPath() throws Exception {
+    FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
+    Repository repo = repoBuilder.setGitDir(gitRepoPath).readEnvironment().findGitDir().build();
+    repo.create();
+
+    gitRepoPath.setReadOnly();
+
+    try {
+      mojo.execute();
+      fail("Mojo should throw a MojoExecutionException");
+    } catch (MojoExecutionException e) {
+      assertThat(e.getCause()).isInstanceOf(AccessDeniedException.class);
     }
   }
 }
